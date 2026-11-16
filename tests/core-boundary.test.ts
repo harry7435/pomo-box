@@ -2,7 +2,7 @@
 import { ESLint } from 'eslint'
 import { describe, expect, it } from 'vitest'
 
-const BOUNDARY_RULES = new Set(['no-restricted-imports', 'no-restricted-globals'])
+const BOUNDARY_RULES = new Set(['no-restricted-imports', 'no-restricted-globals', 'no-restricted-syntax'])
 const eslint = new ESLint()
 
 async function boundaryRuleIds(code: string, filePath: string): Promise<string[]> {
@@ -59,5 +59,26 @@ describe('src/core boundary', { timeout: 30_000 }, () => {
   it('does not restrict react or browser globals outside core', async () => {
     const code = "import 'react'\nexport const width = window.innerWidth\n"
     expect(await boundaryRuleIds(code, 'src/App.tsx')).toEqual([])
+  })
+
+  it('rejects package imports from a core subfolder', async () => {
+    expect(await boundaryRuleIds("import 'react'\n", 'src/core/timer/sample.ts')).toContain('no-restricted-imports')
+  })
+
+  it('rejects bare parent import from a top-level core file', async () => {
+    expect(await boundaryRuleIds("import '..'\n", 'src/core/sample.ts')).toContain('no-restricted-imports')
+  })
+
+  it('rejects bare grandparent import from a core subfolder', async () => {
+    expect(await boundaryRuleIds("import '../..'\n", 'src/core/timer/sample.ts')).toContain('no-restricted-imports')
+  })
+
+  it('rejects any file two folders deep in core', async () => {
+    const code = 'export const value = 1\n'
+    expect(await boundaryRuleIds(code, 'src/core/timer/deep/sample.ts')).toContain('no-restricted-syntax')
+  })
+
+  it('applies package restrictions to files two folders deep in core', async () => {
+    expect(await boundaryRuleIds("import 'react'\n", 'src/core/timer/deep/sample.ts')).toContain('no-restricted-imports')
   })
 })
