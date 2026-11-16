@@ -1,3 +1,5 @@
+> **보류 (2026-11-16):** 웹 우선으로 로드맵이 바뀌어 이 문서는 A0(앱 셋업) 단계용으로 보류한다. 재개할 때 다음을 갱신한다: 패키지 ID `com.ikjun.timebox` → `com.ikjun.pomobox`, 앱 이름 Timebox → Pomobox, 모노레포 경로(`apps/mobile`, `packages/core`), 커밋 메시지 한글·Co-Authored-By 없음. 최신 계획은 `docs/PLAN.md`.
+
 # Phase 0 · 셋업과 배포 파이프라인 Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

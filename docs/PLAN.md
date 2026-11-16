@@ -1,94 +1,131 @@
-# 타임박싱 앱 (React Native) 계획 초안
+# Pomobox 계획
 
-Nov 16, 2026 · @CHO IK JUN
+Nov 16, 2026 · @CHO IK JUN · 최초 초안("타임박싱 앱 (React Native) 계획 초안")을 웹 우선 로드맵으로 갱신
 
 ## 개요
 
-하루를 15\~30분 블록으로 나눠 계획하고, 하루가 끝나면 계획과 실제를 비교해 회고하는 타임박싱 앱을 React Native(Expo)로 만든다. 일론 머스크의 5분 단위 일정 관리에서 착안했지만, 기본 블록은 15분으로 하고 설정에서 바꿀 수 있게 한다.
+하루를 15\~30분 블록으로 나눠 계획하고(타임박싱), 블록 안에서 집중 타이머로 실제 시간을 기록한 뒤(뽀모도로), 하루가 끝나면 계획과 실제를 비교해 회고하는 서비스다. 이름은 **Pomobox**(Pomodoro + Timebox).
+
+웹을 먼저 출시해 바로 매일 쓰면서 기획을 검증하고, 로그인·서버 저장을 붙인 뒤, React Native(Expo) 앱으로 확장해 스토어에 출시한다. 기본 블록은 15분이고 설정에서 바꿀 수 있다.
 
 **목적**
 
-- RN 앱을 기획부터 스토어 출시, 업데이트 운영까지 한 사이클 끝까지 경험한다.
+- 웹으로 빠르게 실사용을 시작해 기획을 검증한다.
+- RN 앱을 스토어 출시, 업데이트 운영까지 한 사이클 끝까지 경험한다.
 - 웹과 다른 RN 고유 영역(제스처·애니메이션, 로컬 DB, 알림, 네이티브 빌드)을 직접 다뤄본다.
-- 포트폴리오에서 웹(To Find Crew·가계부), 풀스택(lotto-time)과 겹치지 않는 모바일 축을 맡는다.
+- 같은 도메인을 웹(DOM)과 앱(RN)으로 구현하며, 플랫폼 독립 core 설계를 경험한다.
 
 **성공 기준**
 
-- iOS App Store와 Google Play에 정식 출시된다.
-- 출시 후 OTA 업데이트와 스토어 업데이트를 각각 1회 이상 배포한다.
-- 본인이 2주 이상 매일 실사용한다.
-- 면접에서 설명할 기술적 의사결정 3가지 이상이 문서로 남는다(저장소 선택, 드래그 구현, 알림 동기화 등).
+- 웹을 배포하고 본인이 2주 이상 매일 실사용한다.
+- 로그인 시 게스트(기기) 데이터가 손실 없이 계정으로 이전된다.
+- Google Play에 정식 출시한다(iOS App Store는 도전 단계).
+- 앱 출시 후 OTA 업데이트와 스토어 업데이트를 각각 1회 이상 배포한다.
+- 면접에서 설명할 기술적 의사결정 3가지 이상이 `docs/decisions/`에 남는다(웹 우선 스택, 저장소·동기화, 드래그, 타이머 정확도, 알림 동기화 등).
 
 ## 기능 범위
 
-MVP는 서버 없이 기기 안에서만 동작하고, 서버와 네이티브 코드는 출시 후에 붙인다.
-
 | 기능 | 단계 | 배우는 것 |
 | --- | --- | --- |
-| 블록 만들기·수정·삭제 (제목, 시작·종료 시간, 카테고리) | MVP | 폼, 바텀시트, SQLite CRUD |
-| 세로 타임라인에 하루 블록 표시, 현재 시간 표시선 | MVP | 절대 위치 레이아웃, 스크롤 |
-| 블록 상태 체크 (완료 / 부분 / 건너뜀) | MVP | 상태 관리, 낙관적 업데이트  |
-| 날짜 이동 (어제·내일, 날짜 선택) | MVP | 날짜 처리, 라우트 파라미터 |
-| 블록 시작 전 로컬 알림 | MVP | expo-notifications, 권한 요청 UX |
-| 드래그로 블록 이동·길이 조절 (블록 단위로 스냅) | 확장 | Gesture Handler, Reanimated |
-| 하루 회고 (완료율, 한 줄 메모, 만족도) | 확장 | 집계 쿼리 |
-| 주간 통계 (카테고리별 시간) | 확장 | 차트 라이브러리 |
-| 템플릿 (평일 루틴을 하루에 불러오기) | 확장 | 데이터 복제, 트랜잭션 |
-| 로그인과 클라우드 동기화 | 도전 | Firebase Auth·Firestore, 로컬 데이터 마이그레이션 |
-| 홈 위젯 (지금·다음 블록) | 도전 | 네이티브 코드, config plugin |
-| 잠금 화면에 진행 중 블록 표시 (iOS Live Activity) | 도전 | Swift, Expo Modules API |
+| 블록 만들기·수정·삭제 (제목, 시작·종료 시간, 카테고리) | W1 | 폼, 저장소 인터페이스, IndexedDB(Dexie) |
+| 세로 타임라인에 하루 블록 표시, 현재 시간 표시선 | W1 | 절대 위치 레이아웃, 스크롤 |
+| 블록 상태 체크 (완료 / 부분 / 건너뜀) | W1 | 상태 관리, 낙관적 업데이트 |
+| 날짜 이동 (어제·내일, 날짜 선택) | W1 | 날짜 처리, 라우트 파라미터 |
+| 드래그로 블록 이동·길이 조절 (블록 단위 스냅) | W2 | dnd-kit, 포인터 이벤트 |
+| 블록 집중 타이머 (블록 끝까지 / 집중·휴식 사이클) | W2 | 타임스탬프 기반 타이머, 백그라운드 탭 제약 |
+| 하루 회고 (계획 대비 완료율·실제 집중 시간, 한 줄 메모, 만족도) | W2 | 집계 쿼리 |
+| 기록 (월간 달력, 날짜별 완료율) | W2 | 날짜 범위 조회 |
+| PWA (데스크톱 설치) | W2 | manifest, 서비스 워커 |
+| 로그인과 서버 저장, 게스트 데이터 이전 | W3 | Firebase Auth·Firestore, 오프라인 캐시, 데이터 마이그레이션 |
+| Android 앱 (위 기능 + 로컬 알림) | A1\~A3 | Expo, RN, gesture-handler·Reanimated, expo-notifications |
+| 주간 통계, 템플릿 | 도전 | 차트, 트랜잭션 |
+| iOS 출시, 홈 위젯, Live Activity(진행 중 타이머) | 도전 | 네이티브 코드, config plugin, Swift |
 
-제외하는 것: 다른 사람과 일정 공유, 구글 캘린더 연동, 반복 일정 규칙(RRULE). 범위가 커져서 출시가 밀리는 주범들이다.
+제외하는 것: 다른 사람과 일정 공유, 구글 캘린더 연동, 반복 일정 규칙(RRULE).
+
+### 집중 타이머 규칙 (W2)
+
+- 블록에서 "집중 시작"을 누르면 설정의 기본 모드로 바로 시작하고, 길게 누르면 모드·시간을 고른다.
+- 모드: **블록 끝까지**(기본) / **집중·휴식 사이클**(프리셋 25/5, 50/10, 직접 입력). 사이클 모드는 30분 이상 블록에서만 고를 수 있고, 블록이 끝나면 마지막 사이클은 잘린다.
+- 블록 시간 안에서 시작하면 남은 시간만큼, 블록 시간 밖에서 시작하면 블록 길이만큼 돌린다.
+- 블록이 끝나면 "연장 / 종료"를 묻고, 연장한 시간도 기록한다.
+- 일시정지는 구간을 닫고, 재개는 새 구간을 연다. 실제 집중 시간 = 구간 합.
+- 끝나면 집중 비율로 상태를 추천한다(예: 80% 이상 "완료"). 결정은 사용자가 한다.
+- 남은 시간은 `setInterval` 누적이 아니라 시작 시각과 현재 시각의 차이로 계산한다(백그라운드 탭 스로틀링 대비).
 
 ## 기술 스택
 
-Expo 최신 SDK를 기반으로, 이미 익숙한 TypeScript·Zustand·Tailwind 감각은 살리고 RN 고유 영역에 학습 시간을 쓴다. 버전은 프로젝트 생성 시점의 최신 안정 버전으로 고정한다.
+### 웹 (W0\~W3)
 
 | 영역 | 선택 | 이유 |
 | --- | --- | --- |
-| 프레임워크 | Expo (Development Build) | 네이티브 모듈을 붙일 수 있고, EAS로 빌드·배포까지 한 흐름으로 연결됨 |
-| 언어 | TypeScript (strict) | 기존 스택 |
-| 라우팅 | Expo Router | 파일 기반 라우팅이라 Next.js App Router와 비교하며 배울 수 있음 |
-| 스타일 | NativeWind | Tailwind 문법 그대로 사용. 단, StyleSheet와의 차이는 따로 익힌다 |
-| 로컬 DB | expo-sqlite + Drizzle ORM | 날짜·시간 범위 쿼리와 집계가 필요해서 키-값 저장소보다 적합. 마이그레이션 관리 가능 |
-| 가벼운 설정값 | MMKV 또는 AsyncStorage | 블록 단위, 테마 등 |
-| UI 상태 | Zustand | 기존 스택. 선택된 날짜, 편집 중인 블록 등 |
-| 제스처·애니메이션 | react-native-gesture-handler + Reanimated | 드래그·리사이즈를 UI 스레드에서 처리 |
-| 바텀시트 | @gorhom/bottom-sheet | 블록 편집 UI |
+| 빌드 | Vite | 서버 기능이 필요 없는 SPA. Next.js보다 단순 |
+| UI | React + TypeScript (strict) | 기존 스택. 빠른 실사용이 목표 |
+| 라우팅 | React Router (W1에서 추가) | SPA 라우팅 |
+| 스타일 | Tailwind CSS v4 | 기존 스택. 앱 단계에서 NativeWind로 클래스 문자열 상당 부분 재사용 |
+| 게스트 저장소 | Dexie (IndexedDB) | 브라우저 내장 DB. 인덱스 범위 조회·트랜잭션 지원 |
+| 서버 저장 (W3) | Firebase Auth + Firestore | 오프라인 캐시와 재연결 동기화를 기본 제공. 무료 한도 내 운영 |
+| UI 상태 | Zustand | 기존 스택. 앱과 공유 가능 |
 | 날짜 | date-fns | 트리 셰이킹, 불변 API |
-| 알림 | expo-notifications | 로컬 알림 예약 |
-| 테스트 | Jest + React Native Testing Library, Maestro | 로직 단위 테스트 + E2E (Playwright 경험과 비교) |
-| 빌드·배포 | EAS Build, EAS Submit, EAS Update | 스토어 제출, OTA 업데이트 |
-| 크래시 추적 | Sentry (후에 Crashlytics로 교체 가능) | 출시 전 연동 |
-| 서버 (도전 단계) | React Native Firebase (Auth, Firestore) | 무료 한도 내 운영, 오프라인 동기화 기본 제공 |
+| 드래그 | dnd-kit | 웹 표준적인 드래그 라이브러리 |
+| 테스트 | Vitest + Testing Library, Playwright | 단위·컴포넌트 + E2E |
+| 배포 | Vercel | GitHub 연동 자동 배포, PR 미리보기 |
 
-## 화면 구성
+### 앱 (A0\~)
 
-하단 탭 3개(오늘 / 기록 / 설정)에, 블록 편집과 회고는 모달로 띄운다. 입력은 타임라인의 빈 칸을 탭하거나 길게 눌러 시작한다.
-
-| 화면 | 경로 (Expo Router) | 주요 동작 |
+| 영역 | 선택 | 이유 |
 | --- | --- | --- |
-| 오늘 (타임라인) | `app/(tabs)/index.tsx` | 세로 타임라인, 현재 시간으로 자동 스크롤, 빈 칸 탭으로 블록 추가, 블록 탭으로 완료 체크, 상단에서 날짜 이동 |
-| 블록 편집 | 바텀시트 (오늘 화면 위) | 제목, 시작·종료 시간, 카테고리, 알림 여부, 삭제 |
-| 하루 회고 | `app/review/[date].tsx` (모달) | 계획 대비 완료율, 건너뛴 블록 목록, 한 줄 메모, 만족도 1\~5 |
-| 기록 | `app/(tabs)/history.tsx` | 월간 달력(날짜별 완료율 색), 주간 카테고리별 시간 |
-| 설정 | `app/(tabs)/settings.tsx` | 블록 단위(5/15/30분), 하루 시작·종료 시간, 알림 미리 알림 시간, 카테고리 관리, 데이터 내보내기 |
-| 카테고리 관리 | `app/settings/categories.tsx` | 이름·색상 추가·수정 |
-| 온보딩 | `app/onboarding.tsx` | 첫 실행 시 블록 단위 선택, 알림 권한 설명 후 요청 |
+| 프레임워크 | Expo (Development Build) | 네이티브 모듈, EAS로 빌드·배포까지 한 흐름 |
+| 라우팅 | Expo Router | 파일 기반. React Router·Next.js와 비교 학습 |
+| 스타일 | NativeWind | 웹 Tailwind 감각 유지. StyleSheet 차이는 따로 익힌다 |
+| 게스트 저장소 | expo-sqlite + Drizzle | 날짜 범위 쿼리·집계, 마이그레이션 관리 |
+| 서버 저장 | React Native Firebase | 웹과 같은 Firestore 데이터 |
+| 제스처·애니메이션 | react-native-gesture-handler + Reanimated | UI 스레드에서 드래그 처리 |
+| 알림 | expo-notifications | 블록 시작·타이머 종료 로컬 알림 |
+| 테스트 | Jest + RNTL, Maestro | Playwright와 비교 |
+| 빌드·배포 | EAS Build / Submit / Update | 스토어 제출, OTA |
+| 크래시 추적 | Sentry | 출시 전 연동 |
 
-디자인은 참고 앱 2\~3개(Structured, Tiimo 등 타임라인형 플래너)를 살펴본 뒤 직접 정한다.
+### 공유 (`core`)
+
+- 도메인 타입, 시간 계산(`time.ts`), 검증, 타이머 계산, Zustand store 로직, 저장소 인터페이스(`BlockRepository` 등).
+- 웹 단계에서는 `src/core/`에 두고 ESLint로 `react`·`react-dom`·`dexie`·`firebase` import와 브라우저 전역(`window`, `document`, `localStorage`, `indexedDB`) 사용을 금지한다.
+- A0에서 모노레포로 전환하며 `packages/core`로 옮긴다.
+
+## 저장소와 로그인 흐름
+
+1. 처음에는 로그인 없이 게스트 저장소(웹 Dexie, 앱 SQLite)에 저장한다.
+2. 적절한 시점에 로그인을 권유한다("다른 기기에서도 보려면 로그인", 데이터가 일정량 쌓였을 때 등).
+3. 첫 로그인 시 게스트 데이터를 서버에 한 번 업로드한다. UUID라 id 충돌이 없다.
+4. 로그인 후에는 Firestore(오프라인 캐시 사용)가 기준 저장소다. 게스트 저장소는 로그아웃 상태 전용.
+5. 화면은 저장소 인터페이스만 사용하고, 로그인 상태에 따라 구현을 바꿔 끼운다.
+
+세부(이미 계정에 데이터가 있는 상태에서 게스트 데이터를 올리는 경우 등)는 W3 spec에서 정한다.
+
+## 화면 구성 (웹)
+
+| 화면 | 경로 | 주요 동작 |
+| --- | --- | --- |
+| 오늘 (타임라인) | `/`, `/day/:date` | 세로 타임라인, 현재 시간으로 자동 스크롤, 빈 칸 클릭으로 블록 추가, 블록 클릭으로 편집·상태 체크, 날짜 이동 |
+| 블록 편집 | 오늘 화면 위 패널 | 제목, 시작·종료 시간, 카테고리, 삭제 |
+| 집중 타이머 | 오늘 화면 위 오버레이 (W2) | 남은 시간, 모드, 일시정지·종료·연장 |
+| 하루 회고 | `/review/:date` (W2) | 완료율, 실제 집중 시간, 건너뛴 블록, 한 줄 메모, 만족도 1\~5 |
+| 기록 | `/history` (W2) | 월간 달력(날짜별 완료율 색) |
+| 설정 | `/settings` | 블록 단위(5/15/30분), 하루 시작·종료 시간, 기본 타이머 모드·시간, 카테고리 관리 |
+
+앱 화면은 A1에서 하단 탭(오늘 / 기록 / 설정) 구조로 옮긴다. 디자인은 타임라인형 플래너(Structured, Tiimo 등)를 살펴본 뒤 정한다.
 
 ## 데이터 모델
 
-테이블은 4개로 시작한다. 시간은 날짜 문자열(`YYYY-MM-DD`)과 자정부터의 분(0\~1439)으로 나눠 저장해 타임존 문제와 하루 단위 조회를 단순하게 한다. id는 나중의 클라우드 동기화를 위해 처음부터 UUID로 한다.
+시간은 날짜 문자열(`YYYY-MM-DD`)과 자정부터의 분(0\~1439)으로 나눠 저장한다. 타이머 구간처럼 실제 시각이 필요한 값만 epoch ms로 저장한다. id는 처음부터 UUID, 모든 테이블에 `updated_at`과 소프트 삭제(`deleted_at`)를 둔다(동기화 대비).
 
 ```
 categories
   id            text (uuid, PK)
   name          text
-  color         text            -- 팩레트 키
+  color         text            -- 팔레트 키
   sort_order    integer
-  created_at, updated_at
+  created_at, updated_at, deleted_at
 
 blocks
   id            text (uuid, PK)
@@ -98,199 +135,128 @@ blocks
   title         text
   category_id   text (FK, nullable)
   status        text            -- planned | done | partial | skipped
-  notify        integer (bool)
-  notification_id text (nullable)  -- 예약된 로컬 알림 id
   memo          text (nullable)
-  created_at, updated_at, deleted_at  -- 소프트 삭제 (동기화 대비)
+  created_at, updated_at, deleted_at
 
-daily_reviews
+focus_sessions                  -- W2
+  id            text (uuid, PK)
+  block_id      text (FK)
+  started_at    integer         -- epoch ms
+  ended_at      integer         -- epoch ms
+  created_at, updated_at, deleted_at
+
+daily_reviews                   -- W2
   date          text (PK)
   rating        integer (1~5)
   note          text
   created_at, updated_at
 
-templates / template_blocks   -- 확장 단계에서 추가
+settings (키-값)
+  block_unit_min, day_start_min, day_end_min,
+  timer_default_mode, timer_focus_min, timer_break_min
 ```
 
-- 같은 날 블록이 겹치는지는 DB 제약이 아니라 앱 로직에서 검사한다. 겹침을 허용할지는 결정 사항에 둔다.
-- 자정을 넘는 블록(23:30\~00:30)은 MVP에서 막고, 하루 종료 시간 설정으로 대신한다.
-- 스키마 변경은 반드시 Drizzle 마이그레이션으로만 한다. 출시 후에는 기존 사용자 데이터가 있기 때문이다.
+- 알림 관련 칼럼(`notify`, `notification_id`)은 앱 단계(A1)에서 추가한다.
+- 같은 날 블록 겹침은 앱 로직에서 검사한다(허용 여부는 결정 사항).
+- 자정을 넘는 블록은 막고, 하루 종료 시간 설정으로 대신한다.
+- 스키마 변경은 버전 관리로만 한다(웹 Dexie `version()`, 앱 Drizzle 마이그레이션). 실사용 데이터가 있기 때문이다.
 
-## 폴더 구조
-
-라우트(`app/`)는 얇게 두고, 기능별 코드는 `src/features/`에 모은다. 타임라인 계산처럼 순수 로직은 UI와 분리해 단위 테스트한다.
+## 폴더 구조 (웹 단계)
 
 ```
-app/
-  _layout.tsx              # 루트: DB 초기화, 테마, 알림 핸들러
-  onboarding.tsx
-  (tabs)/
-    _layout.tsx
-    index.tsx              # 오늘 타임라인
-    history.tsx
-    settings.tsx
-  review/[date].tsx
-  settings/categories.tsx
 src/
-  db/
-    client.ts              # expo-sqlite + drizzle 연결
-    schema.ts
-    migrations/            # drizzle-kit이 생성
+  core/                 # 플랫폼 독립. 앱과 공유 예정 (ESLint로 경계 강제)
+    types.ts
+    time.ts             # 분 ↔ px, 스냅, 겹침 검사 (직접 작성)
+    timer.ts            # 남은 시간·사이클 계산 (W2)
+    repository.ts       # 저장소 인터페이스
+  data/
+    dexie/              # 게스트 저장소 구현 (W1)
+    firestore/          # 서버 저장소 구현 (W3)
   features/
-    timeline/              # Timeline, BlockView, NowIndicator, 드래그 로직
-    blocks/                # 블록 CRUD 훅, 편집 바텀시트
-    review/
-    history/
-    notifications/         # 예약·취소·재동기화
+    timeline/
+    blocks/
+    timer/              # W2
+    review/             # W2
+    history/            # W2
     settings/
-  lib/
-    time.ts                # 분 ↔ px 변환, 스냅, 겹침 검사 (테스트 대상)
-    date.ts
-  stores/                  # zustand
-  components/ui/           # Button, Sheet 등 공통 UI
-  theme/
-.maestro/                  # E2E 시나리오
-eas.json
-app.config.ts              # dev / prod 환경 분리 (번들 ID 다르게)
-CLAUDE.md
-docs/decisions/            # 기술 의사결정 기록 (ADR)
+  stores/               # zustand
+  components/ui/
+  routes/
+e2e/                    # Playwright (W2)
+docs/
+  PLAN.md
+  decisions/            # ADR
+  learnings.md
+  superpowers/specs, plans
 ```
 
 ## 단계별 로드맵
 
-정식 출시까지 6\~7주를 잡는다. 핵심은 기능을 만들기 전에 Phase 0에서 배포 경로부터 뚫는 것이다. 주당 투입 시간에 따라 기간은 조정한다.
+각 단계는 게이트를 통과해야 다음으로 넘어간다. 단계마다 spec → 구현 계획 → 구현 순서로 진행한다.
 
-&#91;embedded content: 단계별 로드맵 · 5단계, 단계마다 게이트\]
+| 단계 | 내용 | 게이트 |
+| --- | --- | --- |
+| W0 · 웹 셋업 | Vite + React + TS strict, Tailwind, ESLint(core 경계), Vitest, Vercel 자동 배포 | Vercel URL에서 앱이 열림, `npm run check` 통과 |
+| W1 · 웹 MVP | 저장소 인터페이스 + Dexie, 블록 CRUD, 타임라인·현재 시간선, 상태 체크, 날짜 이동 | 본인 매일 사용 시작 |
+| W2 · 웹 확장 | 드래그, 집중 타이머, 하루 회고, 기록, PWA, Playwright E2E | 2주 연속 실사용 |
+| W3 · 로그인·서버 저장 | Firebase Auth, Firestore, 게스트 데이터 이전, 로그인 권유 UX | 다른 브라우저에서 로그인하면 같은 데이터 |
+| A0 · 앱 셋업 | 모노레포 전환(`packages/core`), Expo, Android 파이프라인 | 폰에 dev 빌드, Play 내부 테스트 업로드 |
+| A1 · 앱 MVP | core 재사용, RN UI, 로그인 연동, 블록 알림 | 폰에서 매일 사용 |
+| A2 · 앱 인터랙션 | 드래그(gesture-handler), 타이머·알림, 회고, Maestro | 비공개 테스트 시작(12명·14일) |
+| A3 · 앱 출시 | 아이콘·스크린샷, 개인정보처리방침, Sentry, 심사, OTA 1회 | Play 정식 출시 |
+| 도전 | iOS, 홈 위젯, Live Activity, 주간 통계, 템플릿 | — |
 
-각 단계는 게이트를 통과해야 다음으로 넘어간다. 구글 개인 계정은 프로덕션 출시 전에 비공개 테스트 기간 요건이 있으므로, Phase 1이 끝나면 바로 테스터를 모아 비공개 테스트를 시작한다.
-
-### Phase 0 · 셋업과 배포 파이프라인
-
-- [ ] Google Play·Apple 개발자 계정 등록
-- [ ] `create-expo-app`으로 프로젝트 생성, TypeScript strict, ESLint 설정
-- [ ] `app.config.ts`로 dev/prod 번들 ID 분리
-- [ ] Development Build를 만들어 실제 기기에 설치
-- [ ] 빈 앱을 TestFlight와 Play 내부 테스트 트랙에 업로드
-- [ ] CLAUDE.md와 docs/PLAN.md 작성
-
-### Phase 1 · MVP 코어
-
-- [ ] expo-sqlite + Drizzle 연결, 스키마와 첫 마이그레이션
-- [ ] 탭 네비게이션 (오늘 / 기록 / 설정)
-- [ ] 세로 타임라인과 현재 시간 표시선
-- [ ] 블록 추가·수정·삭제 바텀시트
-- [ ] 완료·부분·건너뜀 상태 체크
-- [ ] 날짜 이동
-- [ ] 블록 시작 알림 예약·취소, 권한 요청
-- [ ] `lib/time.ts` 단위 테스트
-- [ ] 내부 테스트 트랙에 재배포
-
-### Phase 2 · 인터랙션과 회고
-
-- [ ] 길게 눌러 드래그 이동, 아래 끝을 끌어 길이 조절, 블록 단위 스냅
-- [ ] 하루 회고 모달
-- [ ] 기록 탭: 월간 달력과 완료율
-- [ ] 온보딩, 다크 모드, 햄틱
-- [ ] Maestro로 "블록 추가 → 체크 → 회고" 시나리오 작성
-
-### Phase 3 · 정식 출시
-
-- [ ] 앱 아이콘, 스플래시, 스토어 스크린샷
-- [ ] 개인정보처리방침 페이지
-- [ ] Sentry 연동
-- [ ] 스토어 등록 정보 작성, 심사 제출, 리젝 대응
-- [ ] 출시 후 EAS Update로 OTA 업데이트 1회
-
-### Phase 4 · 도전 과제
-
-- [ ] 템플릿과 주간 통계
-- [ ] Firebase 로그인·동기화, 기존 로컬 데이터 이전
-- [ ] 홈 위젯
-- [ ] iOS Live Activity
+- Google 개인 개발자 계정은 프로덕션 출시 전에 테스터 12명 이상이 14일 연속 참여하는 비공개 테스트가 필요하다. A1 동안 Android 사용자 지인 명단(15명 정도)을 미리 만든다.
+- A0 준비 문서: `docs/superpowers/specs/2026-11-16-phase0-setup-design.md`, `docs/superpowers/plans/2026-11-16-phase0-setup.md` (보류 중, 패키지 ID·경로 갱신 필요).
 
 ## 기술적 난관과 대응
 
-가장 어려운 두 가지는 타임라인 드래그와 알림 동기화다. 둘 다 해결 과정을 `docs/decisions/`에 남겨 면접 소재로 쓴다.
-
-1. **드래그·리사이즈와 스냅**
-   - 분↔px 변환과 스냅 계산은 Reanimated worklet(UI 스레드)에서 하고, 손을 뗄 때만 `runOnJS`로 DB에 저장한다.
-   - 드래그 중 타임라인 ScrollView와 제스처가 충돌한다. 길게 눌러야 드래그가 시작되게 해서 스크롤과 구분한다.
-   - 화면 끝에서 자동 스크롤은 확장 단계로 미룬다.
-2. **알림 스케줄링**
-   - 블록을 수정·삭제할 때마다 기존 알림을 취소하고 다시 예약한다. `notification_id`를 블록에 저장해 추적한다.
-   - iOS는 한 앱이 예약해둘 수 있는 로컬 알림 개수에 제한(약 64개)이 있다. 오늘과 내일 블록만 예약하고, 앱을 열 때마다 다시 맞춘다.
-   - 권한을 거부한 사용자에게는 설정 화면으로 가는 안내를 보여준다.
-3. **시간과 날짜**
-   - "오늘"은 기기의 현재 타임존 기준이다. 날짜 문자열과 분 단위 저장으로 UTC 변환 문제를 피한다.
-   - 앱이 백그라운드에 있다가 자정을 넘겨 돌아오면 날짜를 갱신한다(AppState).
-4. **타임라인 렌더링 성능**
-   - 하루는 최대 수십 개 블록이라 가상화 리스트 대신 절대 위치 레이아웃을 쓴다. 드래그 중인 블록 외에는 리렌더되지 않게 memo를 적용한다.
-5. **플랫폼 차이**
-   - 시간 선택 UI, 햄틱, 알림 권한 흐름이 iOS와 Android에서 다르다. 각 단계 끝에 두 기기에서 모두 확인한다.
-   - Android 13 이상은 알림 권한을 따로 요청해야 하고, 정확한 시각에 울리는 알림은 별도 권한이 필요할 수 있다. 실제 기기에서 지연 정도를 측정해본다.
+1. **드래그·리사이즈와 스냅**: 웹은 dnd-kit, 앱은 gesture-handler + Reanimated worklet. 스냅 계산은 core의 `time.ts`를 공유한다. 앱에서는 길게 눌러야 드래그가 시작되게 해 스크롤과 구분한다.
+2. **타이머 정확도**: 백그라운드 탭은 타이머가 느려지므로 타임스탬프 차이로 계산한다. 종료 알림은 웹에서 탭이 열려 있을 때만 확실하고, 앱에서는 로컬 알림으로 예약한다.
+3. **게스트 → 계정 이전**: 첫 로그인 업로드의 원자성, 중복 업로드 방지, 이미 데이터가 있는 계정과의 병합 정책.
+4. **알림 스케줄링 (앱)**: 블록 수정·삭제마다 재예약, iOS 예약 개수 제한(약 64개) 대비 오늘·내일만 예약, 권한 거부 시 안내.
+5. **시간과 날짜**: "오늘"은 기기 타임존 기준. 자정을 넘겨 돌아오면 날짜 갱신(웹 `visibilitychange`, 앱 AppState).
+6. **플랫폼 차이**: 시간 선택 UI, 햅틱, 알림 권한 흐름. 단계 끝마다 실제 기기에서 확인한다.
 
 ## 배포 준비물과 비용
 
-필수 비용은 스토어 계정비뿐이고, 나머지는 무료 한도 안에서 충분하다. 구글 개인 계정의 출시 전 테스트 요건 때문에 Android 계정을 먼저 만든다.
-
 | 항목 | 비용 | 필요 시점 |
 | --- | --- | --- |
-| Google Play 개발자 계정 | 1회 $25 | Phase 0 (가장 먼저) |
-| Apple Developer Program | 연 $99 | Phase 0\~1 (TestFlight 배포 전) |
-| Expo 계정 (EAS) | 무료 플랜 | Phase 0. 빌드 횟수가 부족하면 로컬 빌드로 대체 |
-| 개인정보처리방침 페이지 | 무료 (Notion, GitHub Pages, Vercel) | Phase 3 스토어 제출 전 |
-| 앱 아이콘, 스플래시, 스토어 스크린샷 | 무료 (Figma) | Phase 3 |
-| Sentry | 무료 플랜 | Phase 3 |
-| Firebase | 무료 (Spark) | Phase 4. 사진 첨부가 없으면 유료 플랜 불필요 |
+| Vercel | 무료 (Hobby) | W0 |
+| GitHub | 무료 | W0 |
+| Firebase | 무료 (Spark) | W3 |
+| Google Play 개발자 계정 | 1회 $25 | A0 전 (본인 인증 대기 시간 고려) |
+| Expo 계정 (EAS) | 무료 플랜 | A0 |
+| 개인정보처리방침 페이지 | 무료 (웹에 페이지 추가) | W3(로그인 도입 시), A3 |
+| Sentry | 무료 플랜 | A3 |
+| Apple Developer Program | 연 $99 | 도전 단계 (iOS) |
 
-- 번들 ID는 한 번 정하면 바꿀 수 없다. 예: `dev.ikjun.timebox` (prod), `dev.ikjun.timebox.dev` (dev).
-- Android 서명 키는 EAS가 관리하게 하되, 백업 본을 따로 보관한다.
-- 스토어의 데이터 안전(개인정보) 설문은 "수집 없음"으로 시작하고, Sentry·Firebase를 붙일 때 갱신한다.
+- 패키지 ID: prod `com.ikjun.pomobox`, dev `com.ikjun.pomobox.dev`. 한 번 정하면 바꿀 수 없다.
+- 로그인을 도입하면 개인정보를 수집하게 되므로, W3에서 개인정보처리방침을 먼저 게시한다.
 
 ## Claude Code 진행 가이드
 
-학습이 목적이므로, Claude Code에는 코드 생성보다 설명과 리뷰를 맡기고 핵심 로직은 직접 작성한다. 이 문서를 Markdown으로 내보내 `docs/PLAN.md`에 두고, 아래 내용을 `CLAUDE.md`로 시작한다.
+학습이 목적이므로 Claude Code에는 설명과 리뷰를 맡기고 핵심 로직은 직접 작성한다. 운영 규칙은 저장소 루트 `CLAUDE.md`에 둔다.
 
-```markdown
-# Timebox (React Native 학습 프로젝트)
+- 세션 하나에 마일스톤 하나. 시작 전에 계획을 보여주고 확인받는다.
+- 직접 작성: `core/time.ts`, `core/timer.ts`, 드래그 로직, 게스트 데이터 이전, 알림 동기화.
+- 맡겨도 됨: 설정, 보일러플레이트, 테스트, 문서.
+- 막히면 답보다 원인을 묻는다.
+- 마일스톤을 끝낼 때마다 `docs/learnings.md`에 배운 점을 한 단락 남긴다.
 
-## 목적
-- RN 학습과 스토어 출시 경험이 목적이다. 전체 계획은 docs/PLAN.md.
-- 나는 웹 프론트엔드(Next.js) 2년차다. 웹과 다른 RN 개념은 웹과 비교해서 설명해줘.
+## 결정 기록
 
-## 작업 방식
-- 한 번에 한 마일스톤만. 시작 전에 계획을 보여주고 확인받을 것.
-- src/lib/time.ts, 드래그 로직, 알림 동기화는 내가 직접 쓴다. 힌트와 리뷰만 해줘.
-- 설정, 보일러플레이트, 테스트 작성은 맡겨도 된다.
-- 기술 선택을 바꿀 때는 docs/decisions/에 ADR을 남길 것.
-
-## 규칙
-- 패키지 매니저: pnpm. 설치는 `npx expo install`로 (SDK 호환 버전).
-- 스키마 변경은 반드시 drizzle 마이그레이션으로.
-- 시간은 date('YYYY-MM-DD') + 분(0~1439)으로 저장한다.
-- 커밋 전: tsc, lint, jest 통과.
-
-## 명령어
-- 개발: npx expo start
-- 테스트: pnpm test / maestro test .maestro
-- 빌드: eas build --profile development|preview|production
-```
-
-**세션 운영 팁**
-
-- 세션 하나에 마일스톤 하나. 예: "Phase 1의 블록 CRUD만 진행하자. 먼저 계획부터 보여줘."
-- 막히면 답보다 원인을 물어본다. 예: "왜 드래그 중에 스크롤이 같이 움직이는지 설명해줘."
-- 마일스톤을 끝낼 때마다 배운 점을 한 단락씩 남긴다(`docs/learnings.md`). 나중에 블로그와 포트폴리오의 소재가 된다.
-- 시뮬레이터만 믿지 말고 실제 기기에서 확인한다. 알림과 햄틱은 실제 기기에서만 제대로 동작한다.
+- [x] 서비스 이름: **Pomobox**
+- [x] 출시 순서: 웹 → (로그인) → Android → iOS(도전)
+- [x] 웹 스택: React + Vite (Expo 웹 대신, 빠른 실사용 우선)
+- [x] 저장: 게스트 로컬 저장 → 로그인 시 Firestore로 이전, 로그인은 W3(앱 전)
+- [x] 뽀모도로 결합: 블록 집중 타이머 + 집중·휴식 사이클 설정
+- [x] 기본 블록 단위: 15분
+- [x] 앱 패키지 ID: `com.ikjun.pomobox`
 
 ## 결정이 필요한 사항
 
-Phase 0 시작 전에 앞의 세 가지는 정해야 한다. 나머지는 해당 단계에서 정해도 된다.
-
-- [ ] 앱 이름과 번들 ID (스토어에서 이름 중복 여부도 확인)
-- [ ] iOS와 Android를 동시에 출시할지, Android를 먼저 출시할지
-- [ ] 기본 블록 단위 (15분 추천)
-- [ ] 같은 시간에 블록이 겹치는 것을 허용할지 (MVP에서는 막는 쪽이 단순)
-- [ ] 알림 기본값: 블록 시작 시점인지, 5분 전인지
-- [ ] 스타일링을 NativeWind로 갈지, StyleSheet로 기본기를 먼저 익힐지
-- [ ] Phase 4에서 클라우드 동기화(Firebase)와 홈 위젯 중 무엇을 먼저 할지
+- [ ] 같은 시간에 블록이 겹치는 것을 허용할지 (W1, 막는 쪽이 단순)
+- [ ] 계정에 이미 데이터가 있을 때 게스트 데이터 병합 정책 (W3)
+- [ ] 알림 기본값: 블록 시작 시점 / 5분 전 (A1)
