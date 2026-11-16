@@ -66,7 +66,7 @@ docs/
 
 ### 4.3 테스트
 
-- Vitest, 환경 jsdom, `globals: true`, setup 파일에서 `@testing-library/jest-dom/vitest` 등록.
+- Vitest, 환경 jsdom. 전역 API 대신 `vitest`에서 명시적으로 import하고, setup 파일에서 `@testing-library/jest-dom/vitest` 등록과 `afterEach(cleanup)`을 수행한다.
 - 스모크 테스트: `<App />` 렌더 시 "Pomobox" 제목이 보인다.
 - `npm test` = `vitest run`(watch 없음).
 
