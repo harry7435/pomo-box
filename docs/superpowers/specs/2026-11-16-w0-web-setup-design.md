@@ -132,4 +132,4 @@ check      npm run typecheck && npm run lint && npm test
 | --- | --- |
 | `pomobox.vercel.app`이 이미 사용 중 | Vercel이 다른 서브도메인을 붙인다. 커스텀 도메인은 나중에 결정 |
 | 경계 규칙의 상대 경로 패턴이 정상 import까지 막음 | 검증 테스트에 "허용되어야 하는 core 내부 import" 케이스도 넣는다 |
-| Vercel 빌드가 로컬과 다른 Node 버전으로 실패 | `package.json` `engines.node`에 로컬 LTS 주 버전을 명시 |
+| Vercel 빌드가 로컬과 다른 Node 버전으로 실패 | `package.json` `engines.node`를 `">=24"`로 명시 |
