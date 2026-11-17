@@ -13,7 +13,7 @@ Claude Code와 함께 작업할 때의 합의. 학습이 목적이므로 핵심 
 
 ## 역할 분담
 
-- 직접 작성(Claude는 힌트와 리뷰만): `src/core/time.ts`, `src/core/timer.ts`, 드래그 로직, 게스트 데이터 이전, 알림 동기화.
+- 직접 작성(Claude는 힌트와 리뷰만): `packages/core/src/time.ts`, `packages/core/src/timer.ts`, 드래그 로직, 게스트 데이터 이전, 알림 동기화.
 - 맡겨도 됨: 설정, 보일러플레이트, 테스트, 문서.
 
 ## 기록
