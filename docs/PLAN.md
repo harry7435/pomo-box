@@ -89,8 +89,7 @@ Nov 16, 2026 · @CHO IK JUN · 최초 초안("타임박싱 앱 (React Native) �
 ### 공유 (`core`)
 
 - 도메인 타입, 시간 계산(`time.ts`), 검증, 타이머 계산, Zustand store 로직, 저장소 인터페이스(`BlockRepository` 등).
-- 웹 단계에서는 `src/core/`에 두고 ESLint로 `react`·`react-dom`·`dexie`·`firebase` import와 브라우저 전역(`window`, `document`, `localStorage`, `indexedDB`) 사용을 금지한다.
-- A0에서 모노레포로 전환하며 `packages/core`로 옮긴다.
+- `packages/core`(`@pomobox/core`)에 두고 ESLint로 `react`·`react-dom`·`react-native`·`expo*`·`dexie`·`firebase` import와 브라우저 전역 사용을 금지한다. 빌드 없이 TS 소스를 export한다.
 
 ## 저장소와 로그인 흐름
 
@@ -161,34 +160,18 @@ settings (키-값)
 - 자정을 넘는 블록은 막고, 하루 종료 시간 설정으로 대신한다.
 - 스키마 변경은 버전 관리로만 한다(웹 Dexie `version()`, 앱 Drizzle 마이그레이션). 실사용 데이터가 있기 때문이다.
 
-## 폴더 구조 (웹 단계)
+## 폴더 구조
 
 ```
-src/
-  core/                 # 플랫폼 독립. 앱과 공유 예정 (ESLint로 경계 강제)
-    types.ts
-    time.ts             # 분 ↔ px, 스냅, 겹침 검사 (직접 작성)
-    timer.ts            # 남은 시간·사이클 계산 (W2)
-    repository.ts       # 저장소 인터페이스
-  data/
-    dexie/              # 게스트 저장소 구현 (W1)
-    firestore/          # 서버 저장소 구현 (W3)
-  features/
-    timeline/
-    blocks/
-    timer/              # W2
-    review/             # W2
-    history/            # W2
-    settings/
-  stores/               # zustand
-  components/ui/
-  routes/
-e2e/                    # Playwright (W2)
+apps/
+  mobile/               # Expo 앱 (A0~)
+    src/app/            # Expo Router 화면
+    app.config.ts, eas.json
+  web/                  # Vite 웹 (보류)
+packages/
+  core/                 # @pomobox/core: 타입, time.ts(직접 작성), timer.ts, 저장소 인터페이스, 설정값
 docs/
-  PLAN.md
-  decisions/            # ADR
-  learnings.md
-  superpowers/specs, plans
+  PLAN.md, decisions/, learnings.md, guides/, superpowers/
 ```
 
 ## 단계별 로드맵
