@@ -127,9 +127,14 @@ test    npm test --workspaces --if-present
 - [ ] Vercel 미리보기·프로덕션이 `apps/web`에서 정상 빌드, 화면에 core 값 표시
 - [ ] `APP_VARIANT` 유무에 따라 `npx expo config --type public`의 이름·패키지 ID가 4.4대로 나옴
 - [ ] 폰에 "Pomobox (Dev)" 설치, Fast Refresh 동작, core 값 표시
+- [ ] ADR-0002 작성, `docs/learnings.md`에 A0 회고
+
+### Play 게이트 (계정 등록 후, A2 비공개 테스트 전까지)
+
+2026-11-17 결정: Play 개발자 계정 없이 A1로 넘어간다. 아래 항목은 계정이 승인되면 따로 통과한다(작업 순서 #1, #8~#11).
+
 - [ ] 같은 폰에 Play 내부 테스트판 "Pomobox"가 나란히 설치
 - [ ] `eas submit`으로 올린 두 번째 빌드가 트랙에 반영
-- [ ] ADR-0002 작성, `docs/learnings.md`에 A0 회고
 
 ## 7. 범위 밖
 
