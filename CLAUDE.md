@@ -1,6 +1,6 @@
 # Pomobox
 
-타임박싱 + 뽀모도로 서비스. 웹(React + Vite)을 먼저 출시하고, 로그인·서버 저장(W3) 뒤 React Native(Expo) 앱으로 확장하는 학습용 사이드 프로젝트.
+타임박싱 + 뽀모도로 서비스. npm workspaces 모노레포로 Android 앱(Expo, `apps/mobile`)을 먼저 출시하고, 웹(`apps/web`)은 보류 중이다. 웹·앱 공유 로직은 `packages/core`에 둔다. 학습용 사이드 프로젝트.
 
 ## 항상 따르는 규칙
 
@@ -15,4 +15,4 @@
 - [docs/decisions/](docs/decisions/): 기술 의사결정 기록(ADR)
 - [docs/learnings.md](docs/learnings.md): 마일스톤별 회고
 - [docs/guides/commands.md](docs/guides/commands.md): 개발 명령어
-- [src/core/README.md](src/core/README.md): core 경계 규칙
+- [packages/core/README.md](packages/core/README.md): core 경계 규칙

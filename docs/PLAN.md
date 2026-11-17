@@ -6,11 +6,11 @@ Nov 16, 2026 · @CHO IK JUN · 최초 초안("타임박싱 앱 (React Native) �
 
 하루를 15\~30분 블록으로 나눠 계획하고(타임박싱), 블록 안에서 집중 타이머로 실제 시간을 기록한 뒤(뽀모도로), 하루가 끝나면 계획과 실제를 비교해 회고하는 서비스다. 이름은 **Pomobox**(Pomodoro + Timebox).
 
-웹을 먼저 출시해 바로 매일 쓰면서 기획을 검증하고, 로그인·서버 저장을 붙인 뒤, React Native(Expo) 앱으로 확장해 스토어에 출시한다. 기본 블록은 15분이고 설정에서 바꿀 수 있다.
+Android 앱(Expo)을 먼저 출시해 매일 쓰면서 기획을 검증하고, 로그인·서버 저장을 붙인 뒤 웹을 다시 이어간다. 웹은 W0(셋업·배포)까지 마치고 보류 중이다. 기본 블록은 15분이고 설정에서 바꿀 수 있다.
 
 **목적**
 
-- 웹으로 빠르게 실사용을 시작해 기획을 검증한다.
+- 앱으로 빠르게 실사용을 시작해 기획을 검증한다.
 - RN 앱을 스토어 출시, 업데이트 운영까지 한 사이클 끝까지 경험한다.
 - 웹과 다른 RN 고유 영역(제스처·애니메이션, 로컬 DB, 알림, 네이티브 빌드)을 직접 다뤄본다.
 - 같은 도메인을 웹(DOM)과 앱(RN)으로 구현하며, 플랫폼 독립 core 설계를 경험한다.
@@ -55,7 +55,7 @@ Nov 16, 2026 · @CHO IK JUN · 최초 초안("타임박싱 앱 (React Native) �
 
 ## 기술 스택
 
-### 웹 (W0\~W3)
+### 웹 (보류, W0 완료)
 
 | 영역 | 선택 | 이유 |
 | --- | --- | --- |
@@ -89,8 +89,7 @@ Nov 16, 2026 · @CHO IK JUN · 최초 초안("타임박싱 앱 (React Native) �
 ### 공유 (`core`)
 
 - 도메인 타입, 시간 계산(`time.ts`), 검증, 타이머 계산, Zustand store 로직, 저장소 인터페이스(`BlockRepository` 등).
-- 웹 단계에서는 `src/core/`에 두고 ESLint로 `react`·`react-dom`·`dexie`·`firebase` import와 브라우저 전역(`window`, `document`, `localStorage`, `indexedDB`) 사용을 금지한다.
-- A0에서 모노레포로 전환하며 `packages/core`로 옮긴다.
+- `packages/core`(`@pomobox/core`)에 두고 ESLint로 `react`·`react-dom`·`react-native`·`expo*`·`dexie`·`firebase` import와 브라우저 전역 사용을 금지한다. 빌드 없이 TS 소스를 export한다.
 
 ## 저장소와 로그인 흐름
 
@@ -161,54 +160,39 @@ settings (키-값)
 - 자정을 넘는 블록은 막고, 하루 종료 시간 설정으로 대신한다.
 - 스키마 변경은 버전 관리로만 한다(웹 Dexie `version()`, 앱 Drizzle 마이그레이션). 실사용 데이터가 있기 때문이다.
 
-## 폴더 구조 (웹 단계)
+## 폴더 구조
 
 ```
-src/
-  core/                 # 플랫폼 독립. 앱과 공유 예정 (ESLint로 경계 강제)
-    types.ts
-    time.ts             # 분 ↔ px, 스냅, 겹침 검사 (직접 작성)
-    timer.ts            # 남은 시간·사이클 계산 (W2)
-    repository.ts       # 저장소 인터페이스
-  data/
-    dexie/              # 게스트 저장소 구현 (W1)
-    firestore/          # 서버 저장소 구현 (W3)
-  features/
-    timeline/
-    blocks/
-    timer/              # W2
-    review/             # W2
-    history/            # W2
-    settings/
-  stores/               # zustand
-  components/ui/
-  routes/
-e2e/                    # Playwright (W2)
+apps/
+  mobile/               # Expo 앱 (A0~)
+    src/app/            # Expo Router 화면
+    app.config.ts, eas.json
+  web/                  # Vite 웹 (보류)
+packages/
+  core/                 # @pomobox/core: 타입, time.ts(직접 작성), timer.ts, 저장소 인터페이스, 설정값
 docs/
-  PLAN.md
-  decisions/            # ADR
-  learnings.md
-  superpowers/specs, plans
+  PLAN.md, decisions/, learnings.md, guides/, superpowers/
 ```
 
 ## 단계별 로드맵
 
 각 단계는 게이트를 통과해야 다음으로 넘어간다. 단계마다 spec → 구현 계획 → 구현 순서로 진행한다.
 
+**2026-11-17 변경:** 웹 W0 완료 후 앱 우선으로 순서를 바꿨다(ADR-0002). 웹 W1 결정은 `docs/superpowers/specs/2026-11-17-w1-web-mvp-notes.md`에 보류해 두고 앱 A1에 옮겨 쓴다. 로그인은 앱 출시 뒤로 미룬다.
+
 | 단계 | 내용 | 게이트 |
 | --- | --- | --- |
-| W0 · 웹 셋업 | Vite + React + TS strict, Tailwind, ESLint(core 경계), Vitest, Vercel 자동 배포 | Vercel URL에서 앱이 열림, `npm run check` 통과 |
-| W1 · 웹 MVP | 저장소 인터페이스 + Dexie, 블록 CRUD, 타임라인·현재 시간선, 상태 체크, 날짜 이동 | 본인 매일 사용 시작 |
-| W2 · 웹 확장 | 드래그, 집중 타이머, 하루 회고, 기록, PWA, Playwright E2E | 2주 연속 실사용 |
-| W3 · 로그인·서버 저장 | Firebase Auth, Firestore, 게스트 데이터 이전, 로그인 권유 UX | 다른 브라우저에서 로그인하면 같은 데이터 |
-| A0 · 앱 셋업 | 모노레포 전환(`packages/core`), Expo, Android 파이프라인 | 폰에 dev 빌드, Play 내부 테스트 업로드 |
-| A1 · 앱 MVP | core 재사용, RN UI, 로그인 연동, 블록 알림 | 폰에서 매일 사용 |
-| A2 · 앱 인터랙션 | 드래그(gesture-handler), 타이머·알림, 회고, Maestro | 비공개 테스트 시작(12명·14일) |
+| W0 · 웹 셋업 (완료) | Vite + React + TS strict, Tailwind, ESLint(core 경계), Vitest, Vercel 자동 배포 | Vercel URL에서 앱이 열림, `npm run check` 통과 |
+| A0 · 모노레포·앱 셋업 | npm workspaces(`apps/web`, `apps/mobile`, `packages/core`), Expo, Android 파이프라인 | 폰에 dev 빌드, Play 내부 테스트 업로드 |
+| A1 · 앱 MVP | 게스트 SQLite 저장소, 블록 CRUD, 타임라인·현재 시간선, 상태 체크, 날짜 이동, 블록 알림 | 폰에서 매일 사용 |
+| A2 · 앱 인터랙션 | 드래그(gesture-handler), 집중 타이머·알림, 회고, 기록, Maestro | 비공개 테스트 시작(12명·14일) |
 | A3 · 앱 출시 | 아이콘·스크린샷, 개인정보처리방침, Sentry, 심사, OTA 1회 | Play 정식 출시 |
+| L · 로그인·서버 저장 | Firebase Auth, Firestore, 게스트 데이터 이전, 로그인 권유 UX | 다른 기기에서 로그인하면 같은 데이터 |
+| W1~W2 · 웹 기능 | 보류 메모 기반 웹 MVP·확장, 로그인 연동 | 웹과 앱이 같은 데이터 |
 | 도전 | iOS, 홈 위젯, Live Activity, 주간 통계, 템플릿 | — |
 
-- Google 개인 개발자 계정은 프로덕션 출시 전에 테스터 12명 이상이 14일 연속 참여하는 비공개 테스트가 필요하다. A1 동안 Android 사용자 지인 명단(15명 정도)을 미리 만든다.
-- A0 준비 문서: `docs/superpowers/specs/2026-11-16-phase0-setup-design.md`, `docs/superpowers/plans/2026-11-16-phase0-setup.md` (보류 중, 패키지 ID·경로 갱신 필요).
+- Google Play 개발자 계정 없이 개발을 진행한다(2026-11-17 결정). 개발 빌드·APK 직접 설치는 계정이 필요 없고, Play 업로드 경로(내부 테스트 트랙, `eas submit`)는 계정 등록 후 "Play 게이트"로 따로 통과한다. 비공개 테스트(A2) 전에는 계정이 승인되어 있어야 한다. 프로덕션 출시 전에 테스터 12명 이상이 14일 연속 참여하는 비공개 테스트가 필요하므로, A1 동안 Android 사용자 지인 명단(15명 정도)을 미리 만든다.
+- A0 spec: `docs/superpowers/specs/2026-11-17-a0-app-setup-design.md`.
 
 ## 기술적 난관과 대응
 
@@ -248,9 +232,9 @@ docs/
 ## 결정 기록
 
 - [x] 서비스 이름: **Pomobox**
-- [x] 출시 순서: 웹 → (로그인) → Android → iOS(도전)
+- [x] 출시 순서: Android → 로그인 → 웹 → iOS(도전)
 - [x] 웹 스택: React + Vite (Expo 웹 대신, 빠른 실사용 우선)
-- [x] 저장: 게스트 로컬 저장 → 로그인 시 Firestore로 이전, 로그인은 W3(앱 전)
+- [x] 저장: 게스트 로컬 저장 → 로그인 시 Firestore로 이전, 로그인은 앱 출시 뒤(L 단계), ADR-0002
 - [x] 뽀모도로 결합: 블록 집중 타이머 + 집중·휴식 사이클 설정
 - [x] 기본 블록 단위: 15분
 - [x] 앱 패키지 ID: `com.ikjun.pomobox`
