@@ -195,20 +195,21 @@ docs/
 
 각 단계는 게이트를 통과해야 다음으로 넘어간다. 단계마다 spec → 구현 계획 → 구현 순서로 진행한다.
 
+**2026-11-17 변경:** 웹 W0 완료 후 앱 우선으로 순서를 바꿨다(ADR-0002). 웹 W1 결정은 `docs/superpowers/specs/2026-11-17-w1-web-mvp-notes.md`에 보류해 두고 앱 A1에 옮겨 쓴다. 로그인은 앱 출시 뒤로 미룬다.
+
 | 단계 | 내용 | 게이트 |
 | --- | --- | --- |
-| W0 · 웹 셋업 | Vite + React + TS strict, Tailwind, ESLint(core 경계), Vitest, Vercel 자동 배포 | Vercel URL에서 앱이 열림, `npm run check` 통과 |
-| W1 · 웹 MVP | 저장소 인터페이스 + Dexie, 블록 CRUD, 타임라인·현재 시간선, 상태 체크, 날짜 이동 | 본인 매일 사용 시작 |
-| W2 · 웹 확장 | 드래그, 집중 타이머, 하루 회고, 기록, PWA, Playwright E2E | 2주 연속 실사용 |
-| W3 · 로그인·서버 저장 | Firebase Auth, Firestore, 게스트 데이터 이전, 로그인 권유 UX | 다른 브라우저에서 로그인하면 같은 데이터 |
-| A0 · 앱 셋업 | 모노레포 전환(`packages/core`), Expo, Android 파이프라인 | 폰에 dev 빌드, Play 내부 테스트 업로드 |
-| A1 · 앱 MVP | core 재사용, RN UI, 로그인 연동, 블록 알림 | 폰에서 매일 사용 |
-| A2 · 앱 인터랙션 | 드래그(gesture-handler), 타이머·알림, 회고, Maestro | 비공개 테스트 시작(12명·14일) |
+| W0 · 웹 셋업 (완료) | Vite + React + TS strict, Tailwind, ESLint(core 경계), Vitest, Vercel 자동 배포 | Vercel URL에서 앱이 열림, `npm run check` 통과 |
+| A0 · 모노레포·앱 셋업 | npm workspaces(`apps/web`, `apps/mobile`, `packages/core`), Expo, Android 파이프라인 | 폰에 dev 빌드, Play 내부 테스트 업로드 |
+| A1 · 앱 MVP | 게스트 SQLite 저장소, 블록 CRUD, 타임라인·현재 시간선, 상태 체크, 날짜 이동, 블록 알림 | 폰에서 매일 사용 |
+| A2 · 앱 인터랙션 | 드래그(gesture-handler), 집중 타이머·알림, 회고, 기록, Maestro | 비공개 테스트 시작(12명·14일) |
 | A3 · 앱 출시 | 아이콘·스크린샷, 개인정보처리방침, Sentry, 심사, OTA 1회 | Play 정식 출시 |
+| L · 로그인·서버 저장 | Firebase Auth, Firestore, 게스트 데이터 이전, 로그인 권유 UX | 다른 기기에서 로그인하면 같은 데이터 |
+| W1~W2 · 웹 기능 | 보류 메모 기반 웹 MVP·확장, 로그인 연동 | 웹과 앱이 같은 데이터 |
 | 도전 | iOS, 홈 위젯, Live Activity, 주간 통계, 템플릿 | — |
 
-- Google 개인 개발자 계정은 프로덕션 출시 전에 테스터 12명 이상이 14일 연속 참여하는 비공개 테스트가 필요하다. A1 동안 Android 사용자 지인 명단(15명 정도)을 미리 만든다.
-- A0 준비 문서: `docs/superpowers/specs/2026-11-16-phase0-setup-design.md`, `docs/superpowers/plans/2026-11-16-phase0-setup.md` (보류 중, 패키지 ID·경로 갱신 필요).
+- Google 개인 개발자 계정은 A0에서 등록한다. 프로덕션 출시 전에 테스터 12명 이상이 14일 연속 참여하는 비공개 테스트가 필요하므로, A1 동안 Android 사용자 지인 명단(15명 정도)을 미리 만든다.
+- A0 spec: `docs/superpowers/specs/2026-11-17-a0-app-setup-design.md`.
 
 ## 기술적 난관과 대응
 
