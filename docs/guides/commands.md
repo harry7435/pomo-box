@@ -14,3 +14,5 @@
 | 앱 Expo 의존성 설치 | `cd apps/mobile && npx expo install <패키지>` |
 | 앱 출시 빌드 | `cd apps/mobile && eas build --profile production --platform android` |
 | 앱 스토어 제출 (내부 테스트 트랙) | `cd apps/mobile && eas submit --profile production --platform android` |
+
+- 앱의 `android/` 폴더는 생성물이다. dev(`android:dev`)와 prod 변형을 바꿔 로컬 빌드할 때는 `cd apps/mobile && npx expo prebuild --clean`으로 다시 생성한다.
