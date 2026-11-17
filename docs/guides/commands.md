@@ -11,6 +11,7 @@
 | 웹 빌드 | `npm run build -w @pomobox/web` |
 | 앱 개발 빌드 설치·실행 (Android 폰 연결) | `npm run android:dev -w @pomobox/mobile` |
 | 앱 개발 서버만 | `npm start -w @pomobox/mobile` |
+| 앱 prod 변형 로컬 빌드 (스토어용 ID로 확인할 때만) | `npm run android -w @pomobox/mobile` |
 | 앱 Expo 의존성 설치 | `cd apps/mobile && npx expo install <패키지>` |
 | 앱 출시 빌드 | `cd apps/mobile && eas build --profile production --platform android` |
 | 앱 스토어 제출 (내부 테스트 트랙) | `cd apps/mobile && eas submit --profile production --platform android` |
