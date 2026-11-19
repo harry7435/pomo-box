@@ -1,7 +1,7 @@
 import type { Block } from '@pomobox/core'
 import { nextQuickStatus, todayString } from '@pomobox/core'
 import { useCallback, useEffect } from 'react'
-import { Alert, AppState, StyleSheet } from 'react-native'
+import { Alert, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRepositories } from '../data/RepositoryProvider'
 import { DateHeader } from '../features/timeline/DateHeader'
@@ -17,20 +17,13 @@ export default function TodayScreen() {
   const selectedDate = useUiStore((s) => s.selectedDate)
   const now = useNow()
   const today = todayString(now)
-  const blocks = useDayBlocks(selectedDate)
+  const { date: loadedDate, blocks } = useDayBlocks(selectedDate)
   const categories = useCategories()
 
-  // 자정을 넘기거나 앱이 다시 열릴 때 "오늘"을 따라간다.
+  // 자정을 넘기거나 앱이 다시 열릴 때(useNow가 포그라운드에서도 갱신) "오늘"을 따라간다.
   useEffect(() => {
     uiStore.getState().syncToday(today)
   }, [today])
-  useEffect(() => {
-    const subscription = AppState.addEventListener('change', (state) => {
-      if (state === 'active') uiStore.getState().syncToday(todayString(new Date()))
-    })
-    return () => subscription.remove()
-  }, [])
-
   const onToggleStatus = useCallback(
     (block: Block) => {
       blockRepository.update(block.id, { status: nextQuickStatus(block.status) }).catch(() => {
@@ -51,6 +44,7 @@ export default function TodayScreen() {
       />
       <Timeline
         date={selectedDate}
+        loadedDate={loadedDate}
         blocks={blocks}
         categories={categories}
         isToday={selectedDate === today}
