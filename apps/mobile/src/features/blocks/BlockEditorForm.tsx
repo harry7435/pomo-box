@@ -1,6 +1,7 @@
 import type { Block, BlockStatus, Category } from '@pomobox/core'
 import { BLOCK_STATUSES, BLOCK_UNIT_MIN, formatMin, validateBlockInput } from '@pomobox/core'
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { CATEGORY_COLORS, DEFAULT_BLOCK_COLOR, colors } from '../../theme'
 import { STATUS_LABELS } from '../timeline/BlockView'
 import {
@@ -47,7 +48,7 @@ export function BlockEditorForm({ draft, categories, dayBlocks, ignoreId, isExis
 
   return (
     <View style={styles.form}>
-      <TextInput
+      <BottomSheetTextInput
         placeholder="무엇을 할까요?"
         value={draft.title}
         onChangeText={(title) => onChange({ ...draft, title })}

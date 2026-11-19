@@ -34,13 +34,23 @@ export function BlockEditorSheet({ editing, date, dayBlocks, categories, onClose
     else sheetRef.current?.dismiss()
   }, [editing])
 
+  const saving = useRef(false)
   const save = async (value: Draft) => {
+    if (saving.current || !editing) return
+    if (editing.kind === 'existing' && !existing) {
+      // 편집 중이던 블록이 사라졌다. 새로 만들지 않고 닫는다.
+      onClose()
+      return
+    }
+    saving.current = true
     try {
-      if (existing) await blocks.update(existing.id, value)
+      if (editing.kind === 'existing' && existing) await blocks.update(existing.id, value)
       else await blocks.create({ date, ...value })
       onClose()
     } catch {
       Alert.alert('저장하지 못했어요')
+    } finally {
+      saving.current = false
     }
   }
 

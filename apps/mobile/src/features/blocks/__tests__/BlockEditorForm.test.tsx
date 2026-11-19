@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { BlockEditorForm } from '../BlockEditorForm'
 import { draftFromNew, type Draft } from '../draft'
 
+jest.mock('@gorhom/bottom-sheet', () => require('@gorhom/bottom-sheet/mock'))
+
 const categories: Category[] = [
   { id: 'cat-work', name: '업무', color: 'blue', sortOrder: 0, createdAt: 0, updatedAt: 0, deletedAt: null },
 ]
