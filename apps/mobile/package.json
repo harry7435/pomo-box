@@ -5,6 +5,7 @@
   "dependencies": {
     "@expo/ui": "~58.0.28",
     "@pomobox/core": "*",
+    "drizzle-orm": "^0.45.4",
     "expo": "~58.0.25",
     "expo-constants": "~58.0.16",
     "expo-dev-client": "~58.0.20",
@@ -15,6 +16,7 @@
     "expo-linking": "~58.0.17",
     "expo-router": "~58.0.31",
     "expo-splash-screen": "~58.0.14",
+    "expo-sqlite": "~58.0.18",
     "expo-status-bar": "~58.0.5",
     "expo-symbols": "~58.0.5",
     "expo-system-ui": "~58.0.7",
@@ -33,6 +35,8 @@
     "@types/jest": "30.0.0",
     "@types/node": "^24.19.2",
     "@types/react": "~19.3.0",
+    "babel-plugin-inline-import": "^3.0.0",
+    "drizzle-kit": "^0.31.11",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~58.0.4",
     "eslint-import-resolver-typescript": "^3.10.1",
@@ -41,6 +45,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "db:generate": "drizzle-kit generate",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
