@@ -4,6 +4,7 @@ import { useCallback, useEffect } from 'react'
 import { Alert, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRepositories } from '../data/RepositoryProvider'
+import { BlockEditorSheet } from '../features/blocks/BlockEditorSheet'
 import { DateHeader } from '../features/timeline/DateHeader'
 import { Timeline } from '../features/timeline/Timeline'
 import { useCategories } from '../features/timeline/useCategories'
@@ -19,6 +20,7 @@ export default function TodayScreen() {
   const today = todayString(now)
   const { date: loadedDate, blocks } = useDayBlocks(selectedDate)
   const categories = useCategories()
+  const editing = useUiStore((s) => s.editing)
 
   // 자정을 넘기거나 앱이 다시 열릴 때(useNow가 포그라운드에서도 갱신) "오늘"을 따라간다.
   useEffect(() => {
@@ -52,6 +54,13 @@ export default function TodayScreen() {
         onPressEmpty={(startMin) => uiStore.getState().openNew(startMin)}
         onPressBlock={(block) => uiStore.getState().openExisting(block.id)}
         onToggleStatus={onToggleStatus}
+      />
+      <BlockEditorSheet
+        editing={editing}
+        date={editing?.kind === 'new' ? editing.date : selectedDate}
+        dayBlocks={blocks}
+        categories={categories}
+        onClose={() => uiStore.getState().closeEditor()}
       />
     </SafeAreaView>
   )

@@ -1,3 +1,4 @@
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { randomUUID } from 'expo-crypto'
 import { Stack } from 'expo-router'
@@ -23,7 +24,9 @@ function ReadyApp() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <RepositoryProvider value={repositories}>
-        <Stack screenOptions={{ headerShown: false }} />
+        <BottomSheetModalProvider>
+          <Stack screenOptions={{ headerShown: false }} />
+        </BottomSheetModalProvider>
       </RepositoryProvider>
     </GestureHandlerRootView>
   )
