@@ -2,8 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { findConflict, formatMin, minToPx, overlaps, pxToMin, snapMin } from './time'
 import type { Block } from './types'
 
-// 직접 구현할 때 아래 describe.skip을 describe로 바꾸고 통과시킨다.
-
 function block(id: string, startMin: number, endMin: number, deletedAt: number | null = null): Block {
   return {
     id,
@@ -20,7 +18,7 @@ function block(id: string, startMin: number, endMin: number, deletedAt: number |
   }
 }
 
-describe.skip('time', () => {
+describe('time', () => {
   describe('formatMin', () => {
     it.each([
       [0, '00:00'],
