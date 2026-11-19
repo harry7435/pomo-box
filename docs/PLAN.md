@@ -77,8 +77,8 @@ Android 앱(Expo)을 먼저 출시해 매일 쓰면서 기획을 검증하고, �
 | --- | --- | --- |
 | 프레임워크 | Expo (Development Build) | 네이티브 모듈, EAS로 빌드·배포까지 한 흐름 |
 | 라우팅 | Expo Router | 파일 기반. React Router·Next.js와 비교 학습 |
-| 스타일 | NativeWind | 웹 Tailwind 감각 유지. StyleSheet 차이는 따로 익힌다 |
-| 게스트 저장소 | expo-sqlite + Drizzle | 날짜 범위 쿼리·집계, 마이그레이션 관리 |
+| 스타일 | RN StyleSheet (A1 결정, NativeWind는 A2 이후 재검토) | 웹 Tailwind 감각 유지. StyleSheet 차이는 따로 익힌다 |
+| 게스트 저장소 | expo-sqlite + Drizzle | 날짜 범위 쿼리·집계, 마이그레이션 관리 (ADR-0003) |
 | 서버 저장 | React Native Firebase | 웹과 같은 Firestore 데이터 |
 | 제스처·애니메이션 | react-native-gesture-handler + Reanimated | UI 스레드에서 드래그 처리 |
 | 알림 | expo-notifications | 블록 시작·타이머 종료 로컬 알림 |
