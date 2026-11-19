@@ -24,7 +24,7 @@
 | 시간 입력 | 시작 시각 ±15분 버튼 + 길이 칩(15·30·45·60·90분) | 항상 단위 정렬, 엄지 조작. 큰 이동은 A2 드래그 |
 | 상태 체크 | 동그라미 탭으로 계획↔완료, 부분·건너뜀은 시트에서 | 가장 잦은 동작을 한 번에 |
 | 날짜 이동 | 헤더 `‹ 날짜 ›` + "오늘" 버튼 | 달력 선택은 A2 기록 탭 |
-| `time.ts` | 사용자가 직접 작성, 테스트는 Claude가 먼저 작성 | 학습 목표(작업 방식 가이드) |
+| `time.ts` | Claude에게 위임, 테스트는 Claude가 먼저 작성 | 순수 로직이라 RN 학습 목표와 무관 |
 
 ## 3. 구조
 
@@ -34,7 +34,7 @@
 | --- | --- |
 | `types.ts` | `BlockStatus = 'planned' \| 'done' \| 'partial' \| 'skipped'`, `Block`, `Category`, `NewBlock`, `BlockPatch` |
 | `config.ts` | 기존 상수 + `DEFAULT_CATEGORIES`(id 고정 문자열, 이름, 색 키, 순서) |
-| `time.ts` | `formatMin`, `snapMin`, `minToPx`, `pxToMin`, `overlaps`, `findConflict` (직접 작성) |
+| `time.ts` | `formatMin`, `snapMin`, `minToPx`, `pxToMin`, `overlaps`, `findConflict` |
 | `blockRules.ts` | `validateBlockInput(input, existingBlocks, ignoreId?)` → `BlockRuleError[]` |
 | `date.ts` | `isDateString`, `addDays`, `todayString(now)` (date-fns) |
 | `repository.ts` | 아래 인터페이스 |
@@ -148,7 +148,7 @@ babel.config.js          # babel-plugin-inline-import (.sql)
 
 | 대상 | 도구 | 내용 |
 | --- | --- | --- |
-| `time.ts` | Vitest | 3.2의 동작 전부. Claude가 먼저 작성, 사용자가 구현 |
+| `time.ts` | Vitest | 3.2의 동작 전부. Claude 작성 |
 | `blockRules.ts` | Vitest | 오류 코드별, `ignoreId`, 삭제 블록 제외, 맞닿음 허용 |
 | `date.ts` | Vitest | 형식 검증, 이전/다음 날, 월말·연말·윤년 경계 |
 | 저장소 | Jest + `better-sqlite3` 메모리 DB + 같은 마이그레이션 | 날짜별 정렬 조회, 삭제 제외, 변경 시 재알림, 다른 날짜 변경 시 미알림, 구독 해제 후 미알림, 카테고리 시드 1회 |
@@ -162,7 +162,7 @@ E2E(Maestro)는 A2.
 | # | 작업 | 담당 | 선행 |
 | --- | --- | --- | --- |
 | 1 | core 타입·설정·`date.ts`·저장소 인터페이스, `time.ts` 시그니처와 실패 테스트 | 위임 | 없음 |
-| 2 | **`time.ts` 구현** | **직접** | 1 |
+| 2 | `time.ts` 구현 | 위임 | 1 |
 | 3 | Drizzle 설정(schema, client, drizzle-kit, babel·metro), 첫 마이그레이션 | 위임 | 1 |
 | 4 | 저장소 구현과 테스트(better-sqlite3), RepositoryProvider, 카테고리 시드 | 위임 | 3 |
 | 5 | `blockRules.ts`와 테스트 | 위임 | 2 |
@@ -176,7 +176,7 @@ E2E(Maestro)는 A2.
 ## 7. 완료 게이트
 
 - [ ] 루트 `npm run check` 통과
-- [ ] `time.ts` 테스트 전부 통과(직접 구현)
+- [ ] `time.ts` 테스트 전부 통과
 - [ ] 실기기: 블록 생성·수정·겹침 거부·완료 체크·부분/건너뜀·삭제·날짜 이동·앱 재시작 후 데이터 유지
 - [ ] 본인 실사용 시작
 - [ ] ADR-0003, `docs/learnings.md` A1-1 회고
@@ -193,4 +193,3 @@ E2E(Maestro)는 A2.
 | Drizzle `.sql` 마이그레이션 번들링(babel·metro)이 모노레포에서 동작하지 않음 | Expo·Drizzle 공식 가이드 설정을 `apps/mobile`에 적용, 안 되면 원인과 우회를 ADR-0003에 기록 |
 | `better-sqlite3`(네이티브 Node 모듈) 설치·Jest 환경 문제 | 저장소 테스트만 node 환경으로 분리. 설치 실패 시 BLOCKED 보고 후 대안 결정 |
 | `@gorhom/bottom-sheet`가 SDK 58의 reanimated/gesture-handler 버전과 비호환 | `npx expo install`로 호환 버전 확인, 비호환이면 RN `Modal` 기반 시트로 대체 |
-| 사용자의 `time.ts` 구현 대기로 일정 정체 | 3·4번을 병행, 6·7번만 대기 |

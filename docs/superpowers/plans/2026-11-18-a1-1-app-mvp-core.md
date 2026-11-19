@@ -4,7 +4,7 @@
 
 **Goal:** 폰에서 하루를 15분 블록으로 계획·수정·삭제하고 완료를 체크할 수 있는 Pomobox 앱 MVP를 만든다(알림 제외).
 
-**Architecture:** `@pomobox/core`에 도메인 타입·규칙·날짜·시간 계산·저장소 인터페이스를 둔다(`time.ts`는 사용자가 직접 구현). 앱은 expo-sqlite + Drizzle로 저장하고, 저장소는 `({ db, subscribe })`를 받아 구독형 `observeDay`를 제공한다. 화면은 저장소 구독 결과를 그리고, UI 상태만 Zustand에 둔다. 편집은 `@gorhom/bottom-sheet` 안의 폼에서 임시 값으로 하다가 "저장" 시 기록한다.
+**Architecture:** `@pomobox/core`에 도메인 타입·규칙·날짜·시간 계산·저장소 인터페이스를 둔다. 앱은 expo-sqlite + Drizzle로 저장하고, 저장소는 `({ db, subscribe })`를 받아 구독형 `observeDay`를 제공한다. 화면은 저장소 구독 결과를 그리고, UI 상태만 Zustand에 둔다. 편집은 `@gorhom/bottom-sheet` 안의 폼에서 임시 값으로 하다가 "저장" 시 기록한다.
 
 **Tech Stack:** Expo SDK 58, React Native 0.88, Expo Router, expo-sqlite, Drizzle ORM + drizzle-kit, @gorhom/bottom-sheet, Zustand, date-fns, Vitest(core), Jest + RN Testing Library + better-sqlite3(app)
 
@@ -23,7 +23,7 @@
 - 스키마 변경은 `drizzle-kit generate`로만.
 - 스타일은 RN `StyleSheet`(NativeWind 금지). 코드 스타일: 작은따옴표, 세미콜론 없음.
 - 사용자 문구는 한국어. 오류 문구는 spec 4.3 그대로.
-- `packages/core/src/time.ts`의 함수 본문은 **사용자가 직접 작성**한다. 서브에이전트는 시그니처 스텁과 테스트만 만든다.
+- `packages/core/src/time.ts`의 함수 본문은 서브에이전트가 `time.test.ts`를 통과하도록 구현한다.
 - 커밋 메시지는 한글(접두어 유지), **Co-Authored-By 등 트레일러 금지**. 커밋 전 루트 `npm run check` 통과.
 
 ## Review Focus
@@ -405,12 +405,11 @@ git commit -m "feat: core에 블록 타입·날짜 함수·저장소 인터페�
 
 ---
 
-### 직접 작업 B-1: `time.ts` 구현 (Task 1 이후, Task 2·3과 병행)
+### 위임 작업 B-1: `time.ts` 구현 (Task 1 이후, Task 2·3과 병행)
 
-- [ ] `packages/core/src/time.test.ts`의 `describe.skip`을 `describe`로 바꾼다.
-- [ ] `npm exec -w @pomobox/core -- vitest --watch src/time.test.ts`를 켜 두고 `time.ts`의 함수 본문을 하나씩 구현한다.
+- [ ] `packages/core/src/time.test.ts`의 `describe.skip`을 `describe`로 바꾸고 실패(RED)를 확인한다.
+- [ ] 서브에이전트가 `time.ts`의 함수 본문을 구현한다.
 - [ ] `npm run check` 통과 후 커밋: `feat: time.ts 시간 계산 함수 구현`.
-- [ ] 막히면 Claude에게 "time.ts 힌트" 요청. Claude는 답 대신 접근 방법과 리뷰만 준다.
 
 Task 4 이후는 이 작업이 끝나야 시작한다.
 
@@ -996,7 +995,7 @@ git commit -m "feat: Drizzle 기반 블록·카테고리 저장소와 better-sql
 - Modify: `packages/core/src/index.ts`
 
 **Interfaces:**
-- Consumes: 사용자가 구현한 `findConflict`, `config.ts` 상수
+- Consumes: `findConflict`, `config.ts` 상수
 - Produces: `validateBlockInput(input: TimeRange, existing: readonly Block[], ignoreId?: string): BlockRuleError[]`, 타입 `BlockRuleError`, `nextQuickStatus(status: BlockStatus): BlockStatus`.
 
 - [ ] **Step 1: 실패 테스트**
@@ -2382,7 +2381,7 @@ git commit -m "docs: ADR-0003 추가와 가이드 갱신, Expo 템플릿 잔여 
 
 ## Part B · 직접 하실 작업
 
-- [ ] **B-1. `time.ts` 구현** (Task 1 이후, 위 "직접 작업 B-1" 참고)
+- [ ] **B-1. `time.ts` 구현, 위임** (Task 1 이후, 위 "위임 작업 B-1" 참고)
 - [ ] **B-2. dev 빌드 재설치** — `expo-sqlite`, `expo-crypto`, bottom-sheet(reanimated 사용)로 네이티브 코드가 바뀌었으므로 `npm run android:dev -w @pomobox/mobile`. 흰 화면이면 `adb reverse tcp:8081 tcp:8081`.
 - [ ] **B-3. 실기기 확인 (spec 7절)** — 블록 생성·수정·겹침 거부·완료 체크·부분/건너뜀·삭제·날짜 이동·앱 종료 후 재실행 시 데이터 유지.
 - [ ] **B-4. 실사용 시작과 A1-1 회고** — 며칠 사용 후 `docs/learnings.md`에 한 단락.
@@ -2390,7 +2389,7 @@ git commit -m "docs: ADR-0003 추가와 가이드 갱신, Expo 템플릿 잔여 
 ## A1-1 완료 게이트 (spec 7절)
 
 - [ ] 루트 `npm run check` 통과 (Task 1~7)
-- [ ] `time.ts` 테스트 통과, 직접 구현 (B-1)
+- [ ] `time.ts` 테스트 통과, 위임 (B-1)
 - [ ] 실기기 확인 항목 전부 (B-3)
 - [ ] 실사용 시작 (B-4)
 - [ ] ADR-0003(Task 7), A1-1 회고(B-4)
