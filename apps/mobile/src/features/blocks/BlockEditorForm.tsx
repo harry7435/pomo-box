@@ -20,6 +20,7 @@ type Props = {
   dayBlocks: Block[]
   ignoreId?: string
   isExisting: boolean
+  saveDisabled?: boolean
   onChange: (draft: Draft) => void
   onSave: (draft: Draft) => void
   onDelete: () => void
@@ -42,8 +43,9 @@ function Chip({ label, accessibilityLabel, selected, disabled, color, onPress }:
   )
 }
 
-export function BlockEditorForm({ draft, categories, dayBlocks, ignoreId, isExisting, onChange, onSave, onDelete }: Props) {
+export function BlockEditorForm({ draft, categories, dayBlocks, ignoreId, isExisting, saveDisabled = false, onChange, onSave, onDelete }: Props) {
   const errors = validateBlockInput(draft, dayBlocks, ignoreId)
+  const cannotSave = saveDisabled || errors.length > 0
   const duration = draft.endMin - draft.startMin
 
   return (
@@ -52,6 +54,7 @@ export function BlockEditorForm({ draft, categories, dayBlocks, ignoreId, isExis
         placeholder="무엇을 할까요?"
         value={draft.title}
         onChangeText={(title) => onChange({ ...draft, title })}
+        placeholderTextColor={colors.muted}
         style={styles.titleInput}
       />
 
@@ -126,10 +129,10 @@ export function BlockEditorForm({ draft, categories, dayBlocks, ignoreId, isExis
         <View style={styles.spacer} />
         <Pressable
           accessibilityRole="button"
-          accessibilityState={{ disabled: errors.length > 0 }}
-          disabled={errors.length > 0}
+          accessibilityState={{ disabled: cannotSave }}
+          disabled={cannotSave}
           onPress={() => onSave(draft)}
-          style={[styles.saveButton, errors.length > 0 && styles.disabled]}
+          style={[styles.saveButton, cannotSave && styles.disabled]}
         >
           <Text style={styles.saveText}>저장</Text>
         </Pressable>
@@ -140,7 +143,7 @@ export function BlockEditorForm({ draft, categories, dayBlocks, ignoreId, isExis
 
 const styles = StyleSheet.create({
   form: { gap: 14, padding: 16 },
-  titleInput: { fontSize: 18, borderBottomWidth: 1, borderBottomColor: colors.line, paddingVertical: 8 },
+  titleInput: { fontSize: 18, color: colors.text, borderBottomWidth: 1, borderBottomColor: colors.line, paddingVertical: 8 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   timeText: { fontSize: 16, fontWeight: '600', minWidth: 110, textAlign: 'center' },

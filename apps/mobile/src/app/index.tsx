@@ -21,7 +21,7 @@ export default function TodayScreen() {
   const { date: loadedDate, blocks } = useDayBlocks(selectedDate)
   const categories = useCategories()
   const editing = useUiStore((s) => s.editing)
-  const sheetDate = editing?.kind === 'new' ? editing.date : selectedDate
+  const sheetDate = editing?.date ?? selectedDate
 
   // 자정을 넘기거나 앱이 다시 열릴 때(useNow가 포그라운드에서도 갱신) "오늘"을 따라간다.
   useEffect(() => {
@@ -41,14 +41,14 @@ export default function TodayScreen() {
       <DateHeader
         date={selectedDate}
         isToday={selectedDate === today}
-        onPrev={() => uiStore.getState().moveDays(-1)}
-        onNext={() => uiStore.getState().moveDays(1)}
+        onPrev={() => uiStore.getState().moveDays(-1, today)}
+        onNext={() => uiStore.getState().moveDays(1, today)}
         onToday={() => uiStore.getState().goToday(today)}
       />
       <Timeline
         date={selectedDate}
         loadedDate={loadedDate}
-        blocks={blocks}
+        blocks={loadedDate === selectedDate ? blocks : []}
         categories={categories}
         isToday={selectedDate === today}
         now={now}
@@ -61,7 +61,6 @@ export default function TodayScreen() {
       <BlockEditorSheet
         editing={editing}
         date={sheetDate}
-        dayBlocks={loadedDate === sheetDate ? blocks : []}
         categories={categories}
         onClose={() => uiStore.getState().closeEditor()}
       />

@@ -1,5 +1,5 @@
 import type { Block, Category } from '@pomobox/core'
-import { fireEvent, render, screen } from '@testing-library/react-native'
+import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { Alert } from 'react-native'
 import { RepositoryProvider, type Repositories } from '../../../data/RepositoryProvider'
 import { BlockEditorSheet } from '../BlockEditorSheet'
@@ -12,19 +12,26 @@ const gym: Block = {
   status: 'planned', memo: null, createdAt: 0, updatedAt: 0, deletedAt: null,
 }
 
-function setup(createImpl: () => Promise<unknown> = () => Promise.resolve({})) {
+const OTHER = '2026-11-19'
+
+// 실제 observeDay처럼 구독 즉시 동기로 방출한다. loaded에 없는 날짜는 구독해도 방출하지 않는다(미로드).
+function setup(createImpl: () => Promise<unknown> = () => Promise.resolve({}), byDate: Record<string, Block[]> = {}) {
   const repos = {
     blocks: {
       create: jest.fn(createImpl),
       update: jest.fn(() => Promise.resolve({})),
       remove: jest.fn(() => Promise.resolve()),
+      observeDay: jest.fn((date: string, cb: (list: Block[]) => void) => {
+        if (date in byDate) cb(byDate[date])
+        return () => {}
+      }),
     },
     categories: { observeAll: jest.fn(() => () => {}) },
   } as unknown as Repositories
   const onClose = jest.fn()
-  const ui = (editing: Parameters<typeof BlockEditorSheet>[0]['editing'], dayBlocks: Block[] = []) => (
+  const ui = (editing: Parameters<typeof BlockEditorSheet>[0]['editing'], date = '2026-11-18') => (
     <RepositoryProvider value={repos}>
-      <BlockEditorSheet editing={editing} date="2026-11-18" dayBlocks={dayBlocks} categories={categories} onClose={onClose} />
+      <BlockEditorSheet editing={editing} date={date} categories={categories} onClose={onClose} />
     </RepositoryProvider>
   )
   return { repos, onClose, ui }
@@ -46,7 +53,7 @@ describe('BlockEditorSheet', () => {
   })
 
   it('creates once on save and closes', async () => {
-    const { repos, onClose, ui } = setup()
+    const { repos, onClose, ui } = setup(undefined, { '2026-11-18': [] })
     await render(ui({ kind: 'new', date: '2026-11-18', startMin: 600 }))
     await fireEvent.changeText(screen.getByPlaceholderText('무엇을 할까요?'), '기획서')
     await fireEvent.press(screen.getByText('저장'))
@@ -58,7 +65,7 @@ describe('BlockEditorSheet', () => {
   })
 
   it('alerts and stays open when create fails', async () => {
-    const { onClose, ui } = setup(() => Promise.reject(new Error('db')))
+    const { onClose, ui } = setup(() => Promise.reject(new Error('db')), { '2026-11-18': [] })
     await render(ui({ kind: 'new', date: '2026-11-18', startMin: 600 }))
     await fireEvent.press(screen.getByText('저장'))
     expect(Alert.alert).toHaveBeenCalledWith('저장하지 못했어요')
@@ -66,8 +73,8 @@ describe('BlockEditorSheet', () => {
   })
 
   it('updates an existing block instead of creating', async () => {
-    const { repos, onClose, ui } = setup()
-    await render(ui({ kind: 'existing', blockId: 'gym' }, [gym]))
+    const { repos, onClose, ui } = setup(undefined, { '2026-11-18': [gym] })
+    await render(ui({ kind: 'existing', date: '2026-11-18', blockId: 'gym' }))
     await fireEvent.press(screen.getByText('저장'))
     expect(repos.blocks.update).toHaveBeenCalledWith('gym', expect.objectContaining({ title: '헬스장' }))
     expect(repos.blocks.create).not.toHaveBeenCalled()
@@ -75,12 +82,31 @@ describe('BlockEditorSheet', () => {
   })
 
   it('closes without creating when the edited block disappeared', async () => {
-    const { repos, onClose, ui } = setup()
-    const editing = { kind: 'existing' as const, blockId: 'gym' }
-    const { rerender } = await render(ui(editing, [gym]))
-    await rerender(ui(editing, []))
+    const byDate: Record<string, Block[]> = { '2026-11-18': [gym] }
+    const { repos, onClose, ui } = setup(undefined, byDate)
+    const editing = { kind: 'existing' as const, date: '2026-11-18', blockId: 'gym' }
+    const { rerender } = await render(ui(editing))
+    byDate['2026-11-18'] = []
+    // 같은 날짜를 다시 구독하게 하려고 observeDay를 다시 부르는 대신, 구독 콜백을 직접 갱신한다.
+    const calls = (repos.blocks.observeDay as jest.Mock).mock.calls
+    await act(async () => calls[calls.length - 1][1]([]))
+    await rerender(ui(editing))
     await fireEvent.press(screen.getByText('저장'))
     expect(repos.blocks.create).not.toHaveBeenCalled()
     expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not create while the sheet day has not loaded', async () => {
+    const { repos, ui } = setup(undefined, {})
+    await render(ui({ kind: 'new', date: OTHER, startMin: 600 }, OTHER))
+    await fireEvent.press(screen.getByText('저장'))
+    expect(repos.blocks.create).not.toHaveBeenCalled()
+  })
+
+  it('blocks save when overlapping a block on the sheet date', async () => {
+    const { repos, ui } = setup(undefined, { '2026-11-18': [gym] })
+    await render(ui({ kind: 'new', date: '2026-11-18', startMin: 630 }))
+    await fireEvent.press(screen.getByText('저장'))
+    expect(repos.blocks.create).not.toHaveBeenCalled()
   })
 })
