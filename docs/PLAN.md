@@ -77,8 +77,8 @@ Android 앱(Expo)을 먼저 출시해 매일 쓰면서 기획을 검증하고, �
 | --- | --- | --- |
 | 프레임워크 | Expo (Development Build) | 네이티브 모듈, EAS로 빌드·배포까지 한 흐름 |
 | 라우팅 | Expo Router | 파일 기반. React Router·Next.js와 비교 학습 |
-| 스타일 | NativeWind | 웹 Tailwind 감각 유지. StyleSheet 차이는 따로 익힌다 |
-| 게스트 저장소 | expo-sqlite + Drizzle | 날짜 범위 쿼리·집계, 마이그레이션 관리 |
+| 스타일 | RN StyleSheet (A1 결정, NativeWind는 A2 이후 재검토) | RN 스타일 기본기 학습, 타임라인 계산 위치와 잘 맞음. NativeWind는 A2 이후 재검토 |
+| 게스트 저장소 | expo-sqlite + Drizzle | 날짜 범위 쿼리·집계, 마이그레이션 관리 (ADR-0003) |
 | 서버 저장 | React Native Firebase | 웹과 같은 Firestore 데이터 |
 | 제스처·애니메이션 | react-native-gesture-handler + Reanimated | UI 스레드에서 드래그 처리 |
 | 알림 | expo-notifications | 블록 시작·타이머 종료 로컬 알림 |
@@ -155,7 +155,7 @@ settings (키-값)
   timer_default_mode, timer_focus_min, timer_break_min
 ```
 
-- 알림 관련 칼럼(`notify`, `notification_id`)은 앱 단계(A1)에서 추가한다.
+- 알림 관련 칼럼(`notify`, `notification_id`)은 앱 단계(A1-2)에서 추가한다.
 - 같은 날 블록 겹침은 앱 로직에서 검사한다(허용 여부는 결정 사항).
 - 자정을 넘는 블록은 막고, 하루 종료 시간 설정으로 대신한다.
 - 스키마 변경은 버전 관리로만 한다(웹 Dexie `version()`, 앱 Drizzle 마이그레이션). 실사용 데이터가 있기 때문이다.
@@ -169,7 +169,7 @@ apps/
     app.config.ts, eas.json
   web/                  # Vite 웹 (보류)
 packages/
-  core/                 # @pomobox/core: 타입, time.ts(직접 작성), timer.ts, 저장소 인터페이스, 설정값
+  core/                 # @pomobox/core: 타입, time.ts, timer.ts, 저장소 인터페이스, 설정값
 docs/
   PLAN.md, decisions/, learnings.md, guides/, superpowers/
 ```
@@ -221,11 +221,11 @@ docs/
 
 ## Claude Code 진행 가이드
 
-학습이 목적이므로 Claude Code에는 설명과 리뷰를 맡기고 핵심 로직은 직접 작성한다. 운영 규칙은 저장소 루트 `CLAUDE.md`에 둔다.
+학습이 목적이므로 RN 고유 개념(드래그, 알림)은 직접 작성하고, 순수 로직·보일러플레이트는 Claude Code에 맡긴다. 운영 규칙은 저장소 루트 `CLAUDE.md`에 둔다.
 
 - 세션 하나에 마일스톤 하나. 시작 전에 계획을 보여주고 확인받는다.
-- 직접 작성: `core/time.ts`, `core/timer.ts`, 드래그 로직, 게스트 데이터 이전, 알림 동기화.
-- 맡겨도 됨: 설정, 보일러플레이트, 테스트, 문서.
+- 직접 작성: 드래그 로직, 알림 동기화.
+- 맡겨도 됨: 순수 로직(`core/time.ts`, `core/timer.ts`, 게스트 데이터 이전), 설정, 보일러플레이트, 테스트, 문서.
 - 막히면 답보다 원인을 묻는다.
 - 마일스톤을 끝낼 때마다 `docs/learnings.md`에 배운 점을 한 단락 남긴다.
 
